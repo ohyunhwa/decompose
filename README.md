@@ -51,7 +51,8 @@ Figure 1. Architecture Overview
 ```
 conda create -n torch-mps python=3.9
 conda activate torch-mps
-pip3 install torch torchvision
+pip install torch torchvision
+pip install opencv-python
 ```
 
 <br/>
@@ -68,19 +69,38 @@ print(x)
 
 ### Datasets
 
+- Generate source images.
 ```
 python datasets/font2img.py --txt_dir datasets/characters/50characters.txt --fonts_dir datasets/fonts/source --output_dir datasets/images/source --start_idx 0
+```
 
+<br/>
+
+- Generate ground-truth images.
+
+```
 python datasets/font2img.py --txt_dir datasets/characters/50characters.txt --fonts_dir datasets/fonts/target --output_dir datasets/images/target --start_idx 1
+```
 
+<br/>
+
+- Separate components.
+
+```
 python separate.py
+```
 
+<br/>
+
+- Combine components.
+
+```
 python combine.py
 ```
 
 <br/>
 
-#### Train
+### Train
 
 ```
 python main.py --mode train --epochs 1000 --output_dir trained_model 
@@ -88,7 +108,7 @@ python main.py --mode train --epochs 1000 --output_dir trained_model
 
 <br/>
 
-#### Generate
+### Generate
 
 ```
 python main.py --mode test --checkpoint trained_model
@@ -97,6 +117,8 @@ python main.py --mode test --checkpoint trained_model
 <br/>
 
 ## Result
+
+<img src='assets/result.png'/>
 
 
 <br/>
