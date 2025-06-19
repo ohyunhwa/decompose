@@ -2,6 +2,7 @@
 
 Location-based Hangul Component Separation for Accuracy Improvement of Korean Font Generation Model <br/>
 한글 생성 모델의 정확도 향상을 위한 위치 기반 한글 구성요소 분리 <br/>
+<a href='https://oasis.ssu.ac.kr/search/i-discovery/5262559?type=biblios-list-view'>Paper</a>
 
 <br/>
 
@@ -41,7 +42,31 @@ Figure 1. Architecture Overview
 
 ## Experiment
 
-#### Datasets
+### Environment Setting
+
+- HW: M3 MacBook Pro macOS Sequoia
+- IDE: VSCode 1.100.2 (Universal)
+- Download and install <a href='https://www.anaconda.com/download'>Miniconda</a> package.
+
+```
+conda create -n torch-mps python=3.9
+conda activate torch-mps
+pip3 install torch torchvision
+```
+
+<br/>
+
+Now, you can verify environment following commands.
+
+```
+import torch
+x = torch.rand(5,3)
+print(x)
+```
+
+<br/>
+
+### Datasets
 
 ```
 python datasets/font2img.py --txt_dir datasets/characters/50characters.txt --fonts_dir datasets/fonts/source --output_dir datasets/images/source --start_idx 0
@@ -53,11 +78,15 @@ python separate.py
 python combine.py
 ```
 
+<br/>
+
 #### Train
 
 ```
 python main.py --mode train --epochs 1000 --output_dir trained_model 
 ```
+
+<br/>
 
 #### Generate
 
