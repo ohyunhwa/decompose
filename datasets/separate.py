@@ -1,10 +1,12 @@
 import argparse, glob, os, cv2
 import numpy as np
+import cv2 as cv
+from matplotlib import pyplot as plt
 
 SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 DEFAULT_IMAGE_DIR = os.path.join(SCRIPT_PATH, 'images/target')
-DEFAULT_OUTPUT_DIR = os.path.join(SCRIPT_PATH, 'images/target-bbox')
+DEFAULT_OUTPUT_DIR = os.path.join(SCRIPT_PATH, 'images/target-contour-type1')
 
 # opencv > B G R
 color_red = (0, 0, 255)
@@ -22,32 +24,60 @@ def separate(images_dir, output_dir):
         filename = os.path.splitext(os.path.basename(images_list[i]))[0]
         split_filename = filename.split('_')
         
-        fontno = split_filename[0]
+        #fontno = split_filename[0]
         typeno = split_filename[1]
-        char_unicode = split_filename[2]
+        #char_unicode = split_filename[2]
         
-        image = cv2.imread(images_list[i], cv2.IMREAD_GRAYSCALE)
-        if image is None:
-            print(f"Error reading image: {images_list[i]}")
-            continue
+        if typeno == '1':
+            img = cv.imread(images_list[i])
+            assert img is not None, "file could not be read, check with os.path.exists()"
+            gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
+            ret, thresh = cv.threshold(gray,0,255,cv.THRESH_BINARY_INV+cv.THRESH_OTSU)
+            
+            # noise removal
+            kernel = np.ones((3,3),np.uint8)
+            opening = cv.morphologyEx(thresh,cv.MORPH_OPEN,kernel, iterations = 2)
+            
+            # sure background area
+            sure_bg = cv.dilate(opening,kernel,iterations=3)
+            
+            # Finding sure foreground area
+            dist_transform = cv.distanceTransform(opening,cv.DIST_L2,5)
+            ret, sure_fg = cv.threshold(dist_transform,0.7*dist_transform.max(),255,0)
+            
+            # Finding unknown region
+            sure_fg = np.uint8(sure_fg)
+            unknown = cv.subtract(sure_bg,sure_fg)
+            
+            # Marker labelling
+            ret, markers = cv.connectedComponents(sure_fg)
+            
+            # Add one to all labels so that sure background is not 0, but 1
+            markers = markers+1
+            
+            # Now, mark the region of unknown with zero
+            markers[unknown==255] = 0
+            
+            markers = cv.watershed(img,markers)
+            img[markers == -1] = [255,0,0]
 
-        _, thresh = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY_INV)
-        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            plt.imshow(markers)
+            plt.show()
+        elif typeno == '2':
+            pass
         
-        if contours:
-            coordinates = np.concatenate([contour for contour in contours])
-            x, y, w, h = cv2.boundingRect(coordinates)
-
-            bbox_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-            
-            cv2.rectangle(bbox_image, (x, y), (x + w, y + h), color_red, 1)
-            
-            cv2.circle(bbox_image, (x,y), 2, color_blue, -1)
-            cv2.circle(bbox_image, (x+w, y+h), 2, color_green, -1)
-
-            output_path = os.path.join(output_dir, f"{filename}_bbox.png")
-            cv2.imwrite(output_path, bbox_image)
-            print(f"Processed and saved: {output_path}")
+        elif typeno == '3':
+            pass
+        
+        elif typeno == '4':
+            pass
+        
+        elif typeno == '5':
+            pass
+        
+        elif typeno == '6':
+            pass 
+        
         else:
             print(f"No contours found in {images_list[i]}")
             

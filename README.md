@@ -44,8 +44,7 @@ Figure 1. Architecture Overview
 
 ### Environment Setting
 
-- HW: M3 MacBook Pro macOS Sequoia
-- IDE: VSCode 1.100.2 (Universal)
+- M3 MacBook Pro macOS Sequoia
 - Download and install <a href='https://www.anaconda.com/download'>Miniconda</a> package.
 
 ```
@@ -53,6 +52,7 @@ conda create -n torch-mps python=3.9
 conda activate torch-mps
 pip install torch torchvision
 pip install opencv-python
+pip install matplotlib
 ```
 
 <br/>
@@ -120,6 +120,8 @@ python main.py --mode test --checkpoint trained_model
 
 <img src='assets/result.png'/>
 
-
 <br/>
 
+## References 
+
+- <a href='https://docs.opencv.org/4.x/d3/db4/tutorial_py_watershed.html'>Opencv-python docs</a>

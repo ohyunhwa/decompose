@@ -11,8 +11,8 @@ DEFAULT_START_IDX = 0
 
 
 # Width and height of the resulting image.
-IMAGE_WIDTH = 64
-IMAGE_HEIGHT = 64
+IMAGE_WIDTH = 256
+IMAGE_HEIGHT = 256
 
 
 # Generate font image using label file
@@ -66,7 +66,7 @@ def txt2img(txt_dir, fonts_dir, output_dir, start_idx):
                 
                 drawing = ImageDraw.Draw(image)
                 
-                font = ImageFont.truetype(font_path, 48)
+                font = ImageFont.truetype(font_path, 180)
                 
                 new_box = drawing.textbbox((0, 0), character, font)
                 new_w = new_box[2] - new_box[0]
